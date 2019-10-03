@@ -46,11 +46,10 @@ class Snake extends HTMLElement {
   start() {
     this.score = 0;
     this.speed = 200;
-    this.direction = {
+    this.directions = [{
       dx: 10,
       dy: 0
-    };
-    this.changingDirection = false;
+    }];
     this.food = null;
     this.snake = [
       { x: 150, y: 150 },
@@ -68,7 +67,6 @@ class Snake extends HTMLElement {
       return;
     }
     setTimeout(() => {
-      this.changingDirection = false;
       this.clearCanvas();
       this.drawFood();
       this.advanceSnake();
@@ -86,28 +84,33 @@ class Snake extends HTMLElement {
     this.snakeCanvasCtx.strokeRect(0, 0, snakeCanvas.width, snakeCanvas.height);
   }
 
-  drawSnakePart(snakePart) {
-    this.snakeCanvasCtx.fillStyle = 'lightblue';
-    this.snakeCanvasCtx.strokeStyle = 'darkblue';
+  drawSnakePart(snakePart, index) {
+    if (index === 0) {
+      this.snakeCanvasCtx.fillStyle = '#0091DC';
+    } else {
+      this.snakeCanvasCtx.fillStyle = '#E8EBF1';
+    }
+    this.snakeCanvasCtx.strokeStyle = '#333';
     this.snakeCanvasCtx.fillRect(snakePart.x, snakePart.y, 10, 10);
     this.snakeCanvasCtx.strokeRect(snakePart.x, snakePart.y, 10, 10);
   }
 
   drawSnake() {
-    this.snake.forEach((snakePart) => this.drawSnakePart(snakePart));
+    this.snake.forEach((snakePart, i) => this.drawSnakePart(snakePart, i));
   }
 
   drawFood() {
-    this.snakeCanvasCtx.fillStyle = 'lightgreen';
-    this.snakeCanvasCtx.strokeStyle = 'darkgreen';
+    this.snakeCanvasCtx.fillStyle = '#009999';
+    this.snakeCanvasCtx.strokeStyle = '#2B333F';
     this.snakeCanvasCtx.fillRect(this.food.x, this.food.y, 10, 10);
     this.snakeCanvasCtx.strokeRect(this.food.x, this.food.y, 10 , 10);
   }
 
   advanceSnake() {
+    const direction =  this.directions.length > 1 ? this.directions.pop() : this.directions[0];
     const head = {
-      x: this.snake[0].x + this.direction.dx,
-      y: this.snake[0].y + this.direction.dy
+      x: this.snake[0].x + direction.dx,
+      y: this.snake[0].y + direction.dy
     };
     this.snake.unshift(head);
     const didEatFood = this.food != null
@@ -115,6 +118,9 @@ class Snake extends HTMLElement {
       : false;
     if (didEatFood) {
       this.score += 10;
+      if (this.speed !== 80 && this.score % 100 === 0) {
+        this.speed -= 10;
+      }
       setTimeout(() => {
         const scoreElement = this.shadowRoot.getElementById('seveves-snake-score');
         scoreElement.innerText = '' + this.score;
@@ -149,7 +155,7 @@ class Snake extends HTMLElement {
       y: randomCoord(0, snakeCanvas.height - 10)
     };
 
-    if(this.snake.some((snakePart) => snakePart.x === food.x && snakePart.y === food.y)) {
+    if (this.snake.some((snakePart) => snakePart.x === food.x && snakePart.y === food.y)) {
       this.createFood();
     } else {
       this.food = food;
@@ -157,11 +163,6 @@ class Snake extends HTMLElement {
   }
 
   changeDirection(event) {
-    if (this.changingDirection) {
-      return;
-    }
-    this.changingDirection = true;
-
     const LEFT_KEY = 37;
     const RIGHT_KEY = 39;
     const UP_KEY = 38;
@@ -169,34 +170,35 @@ class Snake extends HTMLElement {
 
     const keyPressed = event.keyCode;
 
-    const up = this.direction.dy === -10;
-    const down = this.direction.dy === 10;
-    const right = this.direction.dx === 10;
-    const left = this.direction.dx === -10;
+    const direction = this.directions[0];
+    const up = direction.dy === -10;
+    const down = direction.dy === 10;
+    const right = direction.dx === 10;
+    const left = direction.dx === -10;
 
-    if (keyPressed === LEFT_KEY && !right) {
-      this.direction = {
+    if (keyPressed === LEFT_KEY && !right && !left) {
+      this.directions = [{
         dx: -10,
         dy: 0
-      };
+      }, ...this.directions];
     }
-    if (keyPressed === UP_KEY && !down) {
-      this.direction = {
+    if (keyPressed === UP_KEY && !down && !up) {
+      this.directions = [{
         dx: 0,
         dy: -10
-      };
+      }, ...this.directions];
     }
-    if (keyPressed === RIGHT_KEY && !left) {
-      this.direction = {
+    if (keyPressed === RIGHT_KEY && !left && !right) {
+      this.directions = [{
         dx: 10,
         dy: 0
-      };
+      }, ...this.directions];
     }
-    if (keyPressed === DOWN_KEY && !up) {
-      this.direction = {
+    if (keyPressed === DOWN_KEY && !up && !down) {
+      this.directions = [{
         dx: 0,
         dy: 10
-      };
+      }, ...this.directions];
     }
   }
 }
