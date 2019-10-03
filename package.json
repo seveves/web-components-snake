@@ -1,0 +1,26 @@
+{
+  "name": "web-components-snake",
+  "version": "0.0.1",
+  "description": "A simple Snake game as a Web Component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seveves/web-components-snake.git"
+  },
+  "keywords": [
+    "snake",
+    "webcomponent",
+    "web",
+    "html",
+    "javascript"
+  ],
+  "author": "Severin Friede (sevefriede@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seveves/web-components-snake/issues"
+  },
+  "homepage": "https://github.com/seveves/web-components-snake#readme"
+}
